@@ -2,6 +2,8 @@
 
 ## Visão geral
 
+![Arquitetura](img/arquitetura.png)
+
 ```mermaid
 flowchart LR
   subgraph Alvos monitorados
