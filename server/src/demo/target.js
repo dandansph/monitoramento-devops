@@ -63,7 +63,7 @@ export function startDemoTarget(port) {
 const paths = [...Array(12).fill('/'), ...Array(8).fill('/produtos'), ...Array(8).fill('/produto/1'), ...Array(6).fill('/carrinho'), ...Array(6).fill('/busca?q=rede'), '/produto/999'];
 const ddosPaths = ['/', '/busca?q=' + 'x'.repeat(50), '/admin', '/produto/999'];
 const agent = new http.Agent({ keepAlive: true, maxSockets: 64 });
-const ddosAgent = new http.Agent({ keepAlive: false, maxSockets: 400 });
+const ddosAgent = new http.Agent({ keepAlive: true, maxSockets: 300 }); // keep-alive evita esgotar portas efêmeras do host
 
 function hit(port, ag, list = paths) {
   const p = list[Math.floor(Math.random() * list.length)];

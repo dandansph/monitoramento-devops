@@ -21,9 +21,13 @@ export async function collectDns() {
   const names = isActive('dns-falha') ? [...config.dnsNames, 'servico-inexistente.invalid'] : config.dnsNames;
 
   const start = performance.now();
-  const jobs = [];
-  for (let round = 0; round < 3; round++) for (const s of servers) for (const n of names) jobs.push(resolveOnce(s, n));
-  const results = await Promise.all(jobs);
+  // 3 rodadas sequenciais (em cada rodada as consultas vão em paralelo)
+  const results = [];
+  for (let round = 0; round < 3; round++) {
+    const jobs = [];
+    for (const s of servers) for (const n of names) jobs.push(resolveOnce(s, n));
+    results.push(...(await Promise.all(jobs)));
+  }
   const elapsed = (performance.now() - start) / 1000;
 
   const ok = results.filter((r) => r.ok);

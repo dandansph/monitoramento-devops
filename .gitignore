@@ -10,3 +10,5 @@ test-results/
 playwright-report/
 relatorio/~$*
 .DS_Store
+test-results/
+playwright-report/
