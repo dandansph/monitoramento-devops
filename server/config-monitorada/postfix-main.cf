@@ -1,0 +1,6 @@
+# Configuração monitorada do SMTP (exemplo Postfix)
+myhostname = mail.loja-demo.local
+smtpd_tls_security_level = may
+smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+mynetworks = 127.0.0.0/8
+message_size_limit = 10240000

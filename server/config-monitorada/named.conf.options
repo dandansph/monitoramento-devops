@@ -1,0 +1,9 @@
+// Configuração monitorada do DNS (exemplo BIND9)
+options {
+    directory "/var/cache/bind";
+    recursion yes;
+    allow-recursion { 10.0.0.0/8; 127.0.0.1; };
+    allow-transfer { none; };
+    dnssec-validation auto;
+    forwarders { 8.8.8.8; 1.1.1.1; };
+};

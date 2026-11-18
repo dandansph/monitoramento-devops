@@ -1,0 +1,21 @@
+[
+  { "id": "web-down", "service": "web", "metric": "up", "op": "<", "warn": null, "crit": 1, "for": 1, "description": "Web Server indisponível (health check HTTP falhou)" },
+  { "id": "web-latency", "service": "web", "metric": "latency_ms", "op": ">", "warn": 150, "crit": 400, "for": 2, "description": "Latência HTTP alta" },
+  { "id": "web-errors", "service": "web", "metric": "error_rate", "op": ">", "warn": 12, "crit": 25, "for": 2, "description": "Taxa de erros HTTP (4xx+5xx) alta" },
+  { "id": "web-5xx", "service": "web", "metric": "err_5xx", "op": ">", "warn": 10, "crit": 40, "for": 1, "description": "Respostas 5xx do Web Server" },
+  { "id": "web-rps", "service": "web", "metric": "rps", "op": ">", "warn": 120, "crit": 250, "for": 1, "description": "Volume de requisições acima do normal" },
+  { "id": "web-ddos", "service": "web", "metric": "anomaly_z", "op": ">", "warn": 3, "crit": 6, "for": 1, "description": "Anomalia de tráfego — possível DDoS" },
+  { "id": "db-down", "service": "database", "metric": "up", "op": "<", "warn": null, "crit": 1, "for": 1, "description": "Banco de dados indisponível" },
+  { "id": "db-slow", "service": "database", "metric": "slow_queries", "op": ">", "warn": 5, "crit": 20, "for": 2, "description": "Muitas slow queries" },
+  { "id": "db-rollback", "service": "database", "metric": "rollbacks", "op": ">", "warn": 3, "crit": 6, "for": 2, "description": "Taxa de rollback/falhas de transação alta" },
+  { "id": "db-pool", "service": "database", "metric": "pool_usage_pct", "op": ">", "warn": 70, "crit": 90, "for": 2, "description": "Pool de conexões quase esgotado" },
+  { "id": "db-cpu", "service": "database", "metric": "cpu_pct", "op": ">", "warn": 70, "crit": 90, "for": 2, "description": "CPU do banco alta" },
+  { "id": "dns-down", "service": "dns", "metric": "up", "op": "<", "warn": null, "crit": 1, "for": 1, "description": "Nenhum servidor DNS respondendo" },
+  { "id": "dns-latency", "service": "dns", "metric": "resolve_ms", "op": ">", "warn": 600, "crit": 1200, "for": 2, "description": "Tempo de resolução DNS alto" },
+  { "id": "dns-fail", "service": "dns", "metric": "failure_rate", "op": ">", "warn": 10, "crit": 30, "for": 1, "description": "Taxa de falhas de resolução DNS" },
+  { "id": "smtp-down", "service": "smtp", "metric": "up", "op": "<", "warn": null, "crit": 1, "for": 2, "description": "Servidor SMTP não responde (sonda TCP/EHLO)" },
+  { "id": "smtp-queue", "service": "smtp", "metric": "queue_length", "op": ">", "warn": 30, "crit": 80, "for": 2, "description": "Fila de e-mails crescendo (backlog)" },
+  { "id": "smtp-delivery", "service": "smtp", "metric": "delivery_rate", "op": "<", "warn": 90, "crit": 75, "for": 2, "description": "Taxa de entrega de e-mails baixa" },
+  { "id": "smtp-errors", "service": "smtp", "metric": "error_rate", "op": ">", "warn": 8, "crit": 20, "for": 2, "description": "Rejeições/timeouts SMTP" },
+  { "id": "sec-bruteforce", "service": "security", "metric": "failed_logins_5min", "op": ">", "warn": 5, "crit": 15, "for": 1, "description": "Logins falhos — possível força bruta" }
+]

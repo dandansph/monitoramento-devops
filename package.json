@@ -1,0 +1,18 @@
+{
+  "name": "monitoramento-devops",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PixelNOC - Plataforma de Monitoramento para DevOps (Trabalho Final de Redes de Computadores - IDP)",
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "dev": "concurrently -n server,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w web",
+    "start": "npm run build && npm run start -w server",
+    "test": "npm test -w server",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "concurrently": "^9.0.1"
+  }
+}
