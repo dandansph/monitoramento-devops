@@ -2,6 +2,8 @@
 
 Trabalho Final de **Redes de Computadores e Internet** — IDP (Profa. Lorena Borges).
 
+Autores: Pedro Lucas Lopes Monteiro (25101532), Daniel Henrique Pontes de Souza (25101582) e Leandro Filipe Pereira (25101295).
+
 PixelNOC é um painel de monitoramento de serviços de rede (**Web/HTTP, Banco de Dados, DNS e SMTP**) com
 visual de jogo em pixel art: cada serviço é uma sala de um data center, com um operador que mostra a
 métrica principal num balão de fala e reage ao estado do serviço (verde, amarelo ou vermelho).
