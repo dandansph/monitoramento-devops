@@ -18,6 +18,10 @@ para que qualquer pessoa entenda o estado da infraestrutura em 1 segundo."
 - Barras de "HP" no topo = disponibilidade da última hora. Espadas = missões (alertas) ativas.
 - Mostrar que os dados são **reais**: DNS resolvendo em 8.8.8.8/1.1.1.1, sonda SMTP falando `EHLO` com o Gmail, HTTPS em sites reais.
 
+![Mapa com a visão consolidada dos serviços](../relatorio/prints/03-mapa-visao-consolidada.png)
+*Mapa com a visão consolidada dos serviços*
+
+
 ### 3. Dashboard de um serviço (1,5 min) · *Pessoa B*
 - Clicar na **Sala dos Servidores**: RPS, latência, taxa de erro, 4xx/5xx, conexões ativas.
 - Trocar o período (15m → 1h).
@@ -25,9 +29,17 @@ para que qualquer pessoa entenda o estado da infraestrutura em 1 segundo."
 
 ### 4. Incidente ao vivo: DDoS (2 min) · *Pessoa B*
 - Simulador → **Ataque DDoS**. Voltar ao Mapa.
+
+![Simulador de incidentes com os cenários disponíveis](../relatorio/prints/14-aba-simulador.png)
+*Simulador de incidentes com os cenários disponíveis*
+
 - Insetos invadem a sala, sirene vermelha, alarme toca.
 - Explicar: média móvel + desvio padrão → z-score; acima de 6 = Nível 3.
 - Abrir Missões → clicar **ver e-mail enviado** (mostra o e-mail crítico).
+
+![E-mail de alerta recebido, aberto pelo link ver e-mail enviado](../relatorio/prints/21-email-alerta-critico-recebido.png)
+*E-mail de alerta recebido, aberto pelo link ver e-mail enviado*
+
 - Ler rapidamente o [Playbook PB-01](playbooks.md).
 
 ### 5. Segurança (2 min) · *Pessoa A*
