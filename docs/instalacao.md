@@ -9,7 +9,7 @@
 ## Passo a passo
 
 ```bash
-git clone <url-do-repositorio> monitoramento-devops
+git clone https://github.com/dandansph/monitoramento-devops.git monitoramento-devops
 cd monitoramento-devops
 npm install
 ```
@@ -28,6 +28,13 @@ npm run dev
 
 Acesse http://localhost:5173 e entre com `admin` / `redes2026` (ou o que estiver no `.env`).
 
+![Tela de login exibida ao acessar uma página protegida sem autenticação](../relatorio/prints/01-login-rota-protegida-redireciona.png)
+*Tela de login exibida ao acessar uma página protegida sem autenticação*
+
+![Tela de login após encerrar a sessão com o botão Sair](../relatorio/prints/52-logout.png)
+*Tela de login após encerrar a sessão com o botão Sair*
+
+
 Rodar em modo produção (o servidor entrega o front compilado em :4000):
 
 ```bash
@@ -37,6 +44,10 @@ npm start
 ## E-mail de alertas
 
 - **Sem configurar nada**: o servidor cria uma conta de teste no **Ethereal** (nodemailer). Os e-mails não chegam a ninguém de verdade, mas cada alerta mostra o link "ver e-mail enviado" com a mensagem renderizada — ideal para a apresentação.
+
+![E-mail de alerta recebido, aberto pelo link ver e-mail enviado](../relatorio/prints/21-email-alerta-critico-recebido.png)
+*E-mail de alerta recebido, aberto pelo link ver e-mail enviado*
+
 - **E-mail real (Gmail)**: gere uma "senha de app" na conta Google e preencha em `server/.env`:
 
 ```
