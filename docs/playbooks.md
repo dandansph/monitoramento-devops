@@ -16,6 +16,16 @@ Severidade e tempo de resposta esperado:
 
 **Detecção**: alerta `web-ddos` (z-score > 3 amarelo, > 6 vermelho) e/ou `web-rps`. No mapa, insetos invadem a Sala dos Servidores. Evento `ddos_suspeito` na Guarita.
 
+![Disparo do cenário de ataque DDoS no Simulador](../relatorio/prints/15-cenario-ataque-ddos-1-disparo.png)
+*Disparo do cenário de ataque DDoS no Simulador*
+
+![Mapa durante o ataque DDoS com a sala Web em alerta](../relatorio/prints/16-cenario-ataque-ddos-2-mapa.png)
+*Mapa durante o ataque DDoS com a sala Web em alerta*
+
+![Missões abertas pelo ataque DDoS](../relatorio/prints/17-cenario-ataque-ddos-4-missoes.png)
+*Missões abertas pelo ataque DDoS*
+
+
 **Triagem**
 - É tráfego legítimo (campanha, notícia) ou ataque? Ver se o pico vem de poucos IPs, se os caminhos são estranhos (`/busca?q=xxxxx`, `/admin`) e se a taxa de 4xx subiu.
 - Impacto: latência e health check estão degradados? Serviço caiu?
@@ -75,6 +85,10 @@ Severidade e tempo de resposta esperado:
 ## PB-05 · Vulnerabilidade conhecida em serviço
 
 **Detecção**: card "Vulnerabilidades conhecidas por serviço" (fonte OSV.dev) com avisos para a versão instalada.
+
+![Guarita de Segurança com eventos, IPs bloqueados e vulnerabilidades conhecidas](../relatorio/prints/10-aba-seguranca.png)
+*Guarita de Segurança com eventos, IPs bloqueados e vulnerabilidades conhecidas*
+
 
 **Triagem**: ler o aviso (DSA/DLA/CVE), ver se o componente vulnerável é usado e se está exposto.
 
