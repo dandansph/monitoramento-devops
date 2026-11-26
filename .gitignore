@@ -12,3 +12,6 @@ relatorio/~$*
 .DS_Store
 test-results/
 playwright-report/
+
+# Vídeo leve de demonstração (não versionar)
+relatorio/video/PixelNOC-teste-das-funcoes-leve.webm
