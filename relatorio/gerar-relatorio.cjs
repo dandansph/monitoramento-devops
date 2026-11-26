@@ -8,7 +8,10 @@ const {
 } = require('docx');
 
 const REPO = process.argv[2];
-const IMG = (f) => fs.readFileSync(path.join(REPO, 'docs', 'img', f));
+const IMG = (f) => fs.readFileSync(f.startsWith('prints/') ? path.join(REPO, 'relatorio', f) : path.join(REPO, 'docs', 'img', f));
+// Ordem fixa das figuras no documento (usada nas referências do texto)
+const ORDER = ['arq', 'web1h', 'db', 'dns', 'smtp', 'regras', 'email', 'ddos1', 'ddos2', 'ddos3', 'seg', 'mapa', 'dashweb', 'alertacrit', 'missoes', 'filtro', 'login', 'mapa2', 'sim', 'mobmapa', 'mobweb', 'mobregras', 'mobsim', 'logout'];
+const FIG = (id) => { const i = ORDER.indexOf(id); if (i < 0) throw new Error('figura desconhecida ' + id); return i + 1; };
 const pngSize = (buf) => ({ w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) });
 
 const FONT = 'Arial';
@@ -16,7 +19,7 @@ const CM = 567; // DXA por cm
 const LINE15 = 360;
 const TEXT_W = (21 - 3 - 2) * CM; // largura útil
 
-const AUTORES = ['NOME COMPLETO DO(A) ALUNO(A) 1', 'NOME COMPLETO DO(A) ALUNO(A) 2'];
+const AUTORES = ['PEDRO LUCAS LOPES MONTEIRO (25101532)', 'DANIEL HENRIQUE PONTES DE SOUZA (25101582)', 'LEANDRO FILIPE PEREIRA (25101295)'];
 const TITULO = 'PIXELNOC: PLATAFORMA DE MONITORAMENTO DE SERVIÇOS DE REDE PARA DEVOPS';
 
 // ---------- helpers ----------
@@ -53,8 +56,9 @@ const h2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [ne
 const bullet = (t) => new Paragraph({ numbering: { reference: 'bul', level: 0 }, alignment: AlignmentType.JUSTIFIED, spacing: { line: LINE15 }, children: parseInline(t) });
 
 let figN = 0, tabN = 0;
-function figure(file, caption, widthCm = 16) {
+function figure(file, caption, widthCm = 16, id) {
   figN++;
+  if (id && FIG(id) !== figN) throw new Error(`figura ${id} esperada na posição ${FIG(id)}, mas está na ${figN}`);
   const buf = IMG(file);
   const { w, h } = pngSize(buf);
   const wpx = Math.round(widthCm * 37.8);
@@ -97,7 +101,7 @@ function table(caption, header, rows, widthsCm) {
 // ---------- pré-textuais ----------
 const capa = [
   center('INSTITUTO BRASILEIRO DE ENSINO, DESENVOLVIMENTO E PESQUISA – IDP', { run: { bold: true } }),
-  center('CURSO DE GRADUAÇÃO', { run: { bold: true } }),
+  center('CURSO DE GRADUAÇÃO EM ENGENHARIA DE SOFTWARE', { run: { bold: true } }),
   ...blank(3),
   ...AUTORES.map((a) => center(a)),
   ...blank(6),
@@ -165,7 +169,7 @@ add(p('Ataques de negação de serviço distribuída (DDoS) tentam esgotar recur
 
 add(h1('3 ARQUITETURA DA SOLUÇÃO'));
 add(p('O PixelNOC é composto por um servidor Node.js, que realiza a coleta, o armazenamento, a avaliação das regras e a notificação, e por um front-end React, que consome uma API REST e recebe atualizações em tempo real via WebSocket. A Figura 1 apresenta a visão geral.'));
-add(figure('arquitetura.png', 'Arquitetura do PixelNOC', 16));
+add(figure('arquitetura.png', 'Arquitetura do PixelNOC', 16, 'arq'));
 add(table('Componentes e tecnologias', ['Componente', 'Tecnologia', 'Responsabilidade'], [
   ['Coletores', 'fetch, dns.Resolver, net.Socket, node:sqlite', 'Medir cada serviço a cada 5 s'],
   ['Ingestão', 'Express (POST /api/ingest)', 'Receber métricas de coletores e agentes externos'],
@@ -197,6 +201,11 @@ add(table('Métricas implementadas por serviço', ['Serviço', 'Métricas'], [
   ['DNS', 'Tempo de resposta de resolução; taxa de falhas; queries por segundo; disponibilidade de cada servidor de nomes'],
   ['SMTP', 'Taxa de entrega; tamanho da fila; latência de envio e da sonda; taxa de erros (rejeições e timeouts); volume por minuto e por hora'],
 ], [3.5, 12.5]));
+add(p('Os painéis de cada serviço exibem essas métricas em gráficos, com seleção do período de análise. As Figuras 2 a 5 mostram os painéis do Web Server, do Banco de Dados, do DNS e do SMTP.'));
+add(figure('prints/05-servico-web-periodo-1h.png', 'Painel do Web Server no período de 1 hora', 16, 'web1h'));
+add(figure('prints/06-servico-database-15m.png', 'Painel do Banco de Dados nos últimos 15 minutos', 16, 'db'));
+add(figure('prints/07-servico-dns-15m.png', 'Painel do DNS nos últimos 15 minutos', 16, 'dns'));
+add(figure('prints/08-servico-smtp-15m.png', 'Painel do SMTP nos últimos 15 minutos', 16, 'smtp'));
 
 add(h1('5 REGRAS DE ALERTA E NOTIFICAÇÃO'));
 add(p('Cada regra define a métrica, o operador de comparação, um limite amarelo, um limite vermelho e a quantidade de amostras consecutivas necessárias para disparar. Os três níveis seguem o enunciado:'));
@@ -215,26 +224,36 @@ add(table('Exemplos de regras de alerta', ['Regra', 'Métrica', 'Amarelo', 'Verm
   ['Entrega SMTP', 'delivery_rate', '< 90 %', '< 75 %', '2'],
   ['Força bruta', 'failed_logins_5min', '> 5', '> 15', '1'],
 ], [4, 4, 2.6, 2.6, 2.4]));
-add(p('O envio usa a biblioteca nodemailer. Se nenhum servidor SMTP for configurado, a plataforma cria automaticamente uma conta de teste no serviço Ethereal, e cada alerta exibe um link para a mensagem enviada, o que permite demonstrar o fluxo de e-mail em sala sem expor credenciais reais. Com um servidor SMTP configurado (por exemplo, Gmail com senha de aplicativo), as mensagens chegam à caixa da equipe.'));
+add(p('A Figura 6 mostra a tela de Regras, na qual os limiares e as amostras de cada alerta são editados.'));
+add(figure('prints/12-aba-regras.png', 'Tela de Regras com os limiares de alerta', 16, 'regras'));
+add(p('O envio usa a biblioteca nodemailer. Se nenhum servidor SMTP for configurado, a plataforma cria automaticamente uma conta de teste no serviço Ethereal, e cada alerta exibe um link para a mensagem enviada, o que permite demonstrar o fluxo de e-mail em sala sem expor credenciais reais. Com um servidor SMTP configurado (por exemplo, Gmail com senha de aplicativo), as mensagens chegam à caixa da equipe. A Figura 7 traz um e-mail de alerta aberto pelo link da plataforma.'));
+add(figure('prints/21-email-alerta-critico-recebido.png', 'E-mail de alerta recebido pela equipe', 16, 'email'));
 
 add(h1('6 SEGURANÇA E MONITORAMENTOS EXTRAS'));
 add(h2('6.1 Detecção de anomalias de tráfego (DDoS)'));
-add(p('O detector mantém uma janela móvel com as últimas 60 medições de requisições por segundo e calcula a média e o desvio padrão. Para cada nova medição é calculado o escore-z, isto é, quantos desvios padrão o valor está acima da média. Valores acima de 3 geram alerta amarelo e acima de 6, vermelho. Pontos considerados anômalos não entram na janela, para que um ataque prolongado não passe a ser visto como normal; e, ao reiniciar, a linha de base é reconstruída a partir do histórico gravado, descartando picos. Nos testes, o ataque simulado elevou o tráfego de cerca de 21 para 400 requisições por segundo, com escore-z próximo de 30.'));
+add(p('O detector mantém uma janela móvel com as últimas 60 medições de requisições por segundo e calcula a média e o desvio padrão. Para cada nova medição é calculado o escore-z, isto é, quantos desvios padrão o valor está acima da média. Valores acima de 3 geram alerta amarelo e acima de 6, vermelho. Pontos considerados anômalos não entram na janela, para que um ataque prolongado não passe a ser visto como normal; e, ao reiniciar, a linha de base é reconstruída a partir do histórico gravado, descartando picos. Nos testes, o ataque simulado elevou o tráfego de cerca de 21 para 400 requisições por segundo, com escore-z próximo de 30. As Figuras 8 a 10 registram o disparo do cenário, a reação do mapa e as missões abertas.'));
+add(figure('prints/15-cenario-ataque-ddos-1-disparo.png', 'Disparo do ataque DDoS no Simulador', 16, 'ddos1'));
+add(figure('prints/16-cenario-ataque-ddos-2-mapa.png', 'Mapa durante o ataque DDoS', 16, 'ddos2'));
+add(figure('prints/17-cenario-ataque-ddos-4-missoes.png', 'Missões abertas pelo ataque DDoS', 16, 'ddos3'));
 add(h2('6.2 Falhas de autenticação e força bruta'));
 add(p('Cada tentativa de login malsucedida é registrada com IP de origem e conta. Uma janela deslizante de cinco minutos conta as falhas por IP e por conta: cinco falhas do mesmo IP bloqueiam esse endereço por dez minutos, e oito falhas contra a mesma conta, vindas de IPs diferentes, sinalizam um ataque distribuído contra aquela conta. A tela de Segurança lista os IPs, a situação de bloqueio e as contas visadas.'));
 add(h2('6.3 Alterações de configuração'));
 add(p('Os arquivos de configuração monitorados (nginx.conf, postgresql.conf, named.conf.options e postfix-main.cf) têm seu hash SHA-256 calculado a cada três segundos e comparado com a linha de base armazenada. Qualquer diferença gera um evento com o hash anterior, o novo hash e as linhas alteradas, além de um alerta que permanece aberto até ser reconhecido por um operador.'));
 add(h2('6.4 Vulnerabilidades conhecidas por serviço'));
-add(p('Cada serviço possui um inventário com o software e a versão instalada. A plataforma consulta a API pública OSV.dev, mantida pelo Google, que agrega avisos de segurança de diversas fontes, inclusive do Debian. Na execução de teste, a consulta retornou avisos reais para as versões cadastradas do nginx, do PostgreSQL 13 e do BIND 9, cada um com os CVEs relacionados e a versão que corrige o problema. As dependências da própria plataforma também são verificadas.'));
+add(p('Cada serviço possui um inventário com o software e a versão instalada. A plataforma consulta a API pública OSV.dev, mantida pelo Google, que agrega avisos de segurança de diversas fontes, inclusive do Debian. Na execução de teste, a consulta retornou avisos reais para as versões cadastradas do nginx, do PostgreSQL 13 e do BIND 9, cada um com os CVEs relacionados e a versão que corrige o problema. As dependências da própria plataforma também são verificadas. A Figura 11 apresenta a tela de Segurança, que reúne esses resultados.'));
+add(figure('prints/10-aba-seguranca.png', 'Tela de Segurança da plataforma', 16, 'seg'));
 add(h2('6.5 Proteções da própria plataforma'));
 add(p('A API exige token JWT; o login tem limite de requisições por minuto; o servidor usa cabeçalhos de segurança HTTP (helmet); o WebSocket só aceita conexões autenticadas; e a ingestão externa exige chave de API.'));
 
 add(h1('7 INTERFACE GAMIFICADA'));
-add(p('A visão consolidada é um mapa em pixel art desenhado em Canvas 2D com arte original, gerada em código. Cada serviço ocupa uma sala, e o operador de cada sala exibe a métrica principal em um balão de fala. O estado do serviço muda a cena: em amarelo, a sala pisca e o operador mostra um sinal de exclamação; em vermelho, uma sirene gira e o operador corre; quando o serviço cai, a sala apaga e solta fumaça. Os eventos de segurança também são representados: insetos invadem a sala dos servidores durante um DDoS, figuras encapuzadas aparecem na porta da guarita durante a força bruta e um papel voa até o guarda quando uma configuração muda (Figura 2).'));
-add(figure('desktop-mapa.png', 'Visão consolidada do PixelNOC', 16));
-add(p('Ao clicar em uma sala, abre-se o dashboard do serviço, com indicadores atuais, alertas ativos e gráficos de todas as métricas, em períodos de 15 minutos a 24 horas (Figura 3). Barras de "vida" no topo mostram a disponibilidade de cada serviço na última hora, e os alertas aparecem como "missões" em um quadro próprio, com link para o e-mail enviado. O layout é responsivo e se reorganiza em uma coluna no celular.'));
-add(figure('desktop-servico-web.png', 'Dashboard do serviço Web', 16));
-add(figure('alerta-critico.png', 'Quadro de missões com alerta crítico', 16));
+add(p(`A visão consolidada é um mapa em pixel art desenhado em Canvas 2D com arte original, gerada em código. Cada serviço ocupa uma sala, e o operador de cada sala exibe a métrica principal em um balão de fala. O estado do serviço muda a cena: em amarelo, a sala pisca e o operador mostra um sinal de exclamação; em vermelho, uma sirene gira e o operador corre; quando o serviço cai, a sala apaga e solta fumaça. Os eventos de segurança também são representados: insetos invadem a sala dos servidores durante um DDoS, figuras encapuzadas aparecem na porta da guarita durante a força bruta e um papel voa até o guarda quando uma configuração muda (Figura ${FIG('mapa')}).`));
+add(figure('desktop-mapa.png', 'Visão consolidada do PixelNOC', 16, 'mapa'));
+add(p(`Ao clicar em uma sala, abre-se o dashboard do serviço, com indicadores atuais, alertas ativos e gráficos de todas as métricas, em períodos de 15 minutos a 24 horas (Figura ${FIG('dashweb')}). Barras de "vida" no topo mostram a disponibilidade de cada serviço na última hora, e os alertas aparecem como "missões" em um quadro próprio, com link para o e-mail enviado. O layout é responsivo e se reorganiza em uma coluna no celular.`));
+add(figure('desktop-servico-web.png', 'Dashboard do serviço Web', 16, 'dashweb'));
+add(figure('alerta-critico.png', 'Quadro de missões com alerta crítico', 16, 'alertacrit'));
+add(p(`As Figuras ${FIG('missoes')} e ${FIG('filtro')} mostram o quadro de missões sem alertas ativos e o histórico filtrado por alertas críticos.`));
+add(figure('prints/09-aba-missoes-sem-alertas.png', 'Quadro de missões sem alertas ativos', 16, 'missoes'));
+add(figure('prints/44-missoes-filtro-criticos.png', 'Histórico de missões filtrado por alertas críticos', 16, 'filtro'));
 
 add(h1('8 TESTES'));
 add(p('Foram feitos três tipos de teste. Os testes unitários (Vitest) cobrem a lógica de classificação e histerese dos alertas, o detector de anomalias, o detector de força bruta e o diff de configuração, totalizando 14 casos aprovados. Os testes de navegação e uso (Playwright) simulam um usuário em dois perfis de tela, desktop (1440 × 900) e celular (Pixel 7), conforme a Tabela 5.'));
@@ -247,6 +266,15 @@ add(table('Testes automatizados de navegação', ['ID', 'Caso de teste', 'Result
   ['CT06', 'Derrubar o Web Server', 'Alerta crítico em até 30 s', 'Aprovado', 'N/A'],
   ['CT07', 'Editar limiar de regra', 'Confirmação "Regras salvas"', 'Aprovado', 'N/A'],
 ], [1.3, 4.2, 5.5, 2.5, 2.5]));
+add(p(`As Figuras ${FIG('login')} a ${FIG('logout')} documentam a execução dos testes: o redirecionamento ao login (CT01), a visão consolidada (CT03), o Simulador de incidentes usado nos cenários e as telas em celular, encerrando com a saída da sessão.`));
+add(figure('prints/01-login-rota-protegida-redireciona.png', 'Redirecionamento ao login ao acessar página protegida', 16, 'login'));
+add(figure('prints/03-mapa-visao-consolidada.png', 'Visão consolidada após o login', 16, 'mapa2'));
+add(figure('prints/14-aba-simulador.png', 'Simulador de incidentes', 16, 'sim'));
+add(figure('prints/46-mobile-mapa.png', 'Visão consolidada em celular', 7, 'mobmapa'));
+add(figure('prints/47-mobile-servico-web.png', 'Painel do Web Server em celular', 7, 'mobweb'));
+add(figure('prints/50-mobile-aba-regras.png', 'Tela de Regras em celular', 7, 'mobregras'));
+add(figure('prints/51-mobile-aba-simulador.png', 'Simulador de incidentes em celular', 7, 'mobsim'));
+add(figure('prints/52-logout.png', 'Tela de login após encerrar a sessão', 16, 'logout'));
 add(p('Por fim, cada cenário do simulador (DDoS, queda do servidor web, erros 5xx, banco lento, falha de DNS, fila de e-mail, força bruta e alteração de configuração) foi executado manualmente, verificando o alerta, o e-mail e a reação do mapa. Durante o cenário de DDoS observou-se um efeito colateral real: o gerador de ataque, ao abrir uma conexão TCP nova por requisição, esgotou as portas efêmeras do sistema operacional, e o envio de e-mail falhou com o erro EADDRINUSE. O problema foi corrigido com conexões persistentes (_keep-alive_) e ilustra bem como um ataque volumétrico afeta a pilha TCP do próprio host.'));
 
 add(h1('9 DOCUMENTAÇÃO OPERACIONAL'));
