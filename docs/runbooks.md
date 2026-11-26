@@ -6,6 +6,10 @@ Procedimentos operacionais para cada alerta. Formato: **sintoma → diagnóstico
 
 ## Web Server (HTTP/HTTPS)
 
+
+![Painel do Web Server com o gráfico no período de 1 hora](../relatorio/prints/05-servico-web-periodo-1h.png)
+*Painel do Web Server com o gráfico no período de 1 hora*
+
 ### WEB-01 · Web Server indisponível (`web-down`, Nível 3)
 1. **Confirmar**: no painel Web, o tile Status está `DOWN` e o gráfico de disponibilidade caiu para 0.
 2. **Diagnóstico de rede (do mais baixo ao mais alto nível)**:
@@ -32,6 +36,10 @@ Ver [Playbook PB-01](playbooks.md#pb-01--ataque-ddos--pico-anormal-de-tráfego).
 
 ## Banco de Dados
 
+
+![Painel do Banco de Dados com as métricas dos últimos 15 minutos](../relatorio/prints/06-servico-database-15m.png)
+*Painel do Banco de Dados com as métricas dos últimos 15 minutos*
+
 ### DB-01 · Banco indisponível (`db-down`)
 1. `Test-NetConnection <host> -Port 5432`; `pg_isready -h <host>`.
 2. Ver logs do PostgreSQL, espaço em disco, processo vivo.
@@ -54,6 +62,10 @@ Ver [Playbook PB-01](playbooks.md#pb-01--ataque-ddos--pico-anormal-de-tráfego).
 
 ## DNS
 
+
+![Painel do DNS com as métricas dos últimos 15 minutos](../relatorio/prints/07-servico-dns-15m.png)
+*Painel do DNS com as métricas dos últimos 15 minutos*
+
 ### DNS-01 · Nenhum servidor responde (`dns-down`)
 1. `nslookup google.com 8.8.8.8` e `nslookup google.com 1.1.1.1`.
 2. Se todos falham → problema de saída na rede (firewall bloqueando UDP/53, link caído).
@@ -71,6 +83,10 @@ Ver [Playbook PB-01](playbooks.md#pb-01--ataque-ddos--pico-anormal-de-tráfego).
 ---
 
 ## SMTP
+
+
+![Painel do SMTP com as métricas dos últimos 15 minutos](../relatorio/prints/08-servico-smtp-15m.png)
+*Painel do SMTP com as métricas dos últimos 15 minutos*
 
 ### SMTP-01 · Servidor não responde (`smtp-down`)
 1. `Test-NetConnection smtp.gmail.com -Port 587`.
