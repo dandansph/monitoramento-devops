@@ -75,6 +75,13 @@ config_snapshots(file, hash, content, ts)    -- linha de base de integridade
 - Para voltar ao verde são exigidas 2 amostras normais (evita "flapping").
 - Alertas de evento (mudança de configuração) ficam abertos até alguém reconhecer.
 
+![Tela de Regras com os limiares de alerta editáveis](../relatorio/prints/12-aba-regras.png)
+*Tela de Regras com os limiares de alerta editáveis*
+
+![Quadro de Missões sem alertas ativos](../relatorio/prints/09-aba-missoes-sem-alertas.png)
+*Quadro de Missões sem alertas ativos*
+
+
 ## API
 
 | Método | Rota | Descrição |
